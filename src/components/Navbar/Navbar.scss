@@ -89,6 +89,16 @@
                 justify-content: center;
             }
 
+            &::before {
+                content: '';
+                position: absolute;
+                top: 25px;
+                left: 5px;
+                background: transparent;
+                width: 26px;
+                height: 20px;
+            }
+
             &:hover {
                 .cart-modal {
                     opacity: 1;

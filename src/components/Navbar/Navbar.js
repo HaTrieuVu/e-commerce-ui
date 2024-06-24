@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Navbar.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSidebarOn } from '../../store/sidebarSlice';
 import { getAllCategories } from '../../store/categorySlice';
@@ -9,7 +9,27 @@ import CartModal from '../CartModal/CartModal';
 
 const Navbar = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const categories = useSelector(getAllCategories);
+    const carts = useSelector(getAllCarts);
+    const itemsCount = useSelector(getCartItemsCount);
+
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        dispatch(getCartTotal());
+    }, [carts]);
+
+    const handleSearchTerm = (e) => {
+        e.preventDefault();
+        setSearchTerm(e.target.value);
+    };
+
+    const handleSearch = (e) => {
+        if (e.code === 'Enter') {
+            navigate(`search/${searchTerm}`);
+        }
+    };
 
     return (
         <nav className="navbar">
@@ -38,9 +58,14 @@ const Navbar = () => {
                             <input
                                 type="text"
                                 className="form-control fs-14"
+                                onChange={(e) => handleSearchTerm(e)}
+                                onKeyDown={(e) => handleSearch(e)}
                                 placeholder="Search your preferred items here"
                             ></input>
-                            <Link to="/" className="search-btn text-white flex align-center justify-center">
+                            <Link
+                                to={`search/${searchTerm}`}
+                                className="search-btn text-white flex align-center justify-center"
+                            >
                                 <i className="fa-solid fa-magnifying-glass"></i>
                             </Link>
                         </div>
@@ -58,10 +83,13 @@ const Navbar = () => {
                 </div>
 
                 <div className="navbar-cart flex align-center">
-                    <Link to="/cart" className="cart-btn">
-                        <i className="fa-solid fa-cart-shopping"></i>
-                        <div className="cart-items-value">0</div>
-                    </Link>
+                    <div className="cart-btn">
+                        <Link to="/cart">
+                            <i className="fa-solid fa-cart-shopping"></i>
+                        </Link>
+                        <div className="cart-items-value">{itemsCount}</div>
+                        <CartModal carts={carts} />
+                    </div>
                 </div>
             </div>
         </nav>
